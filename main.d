@@ -1,8 +1,8 @@
 import std.stdio;
+import std.regex;
 
 import source;
 import lexer;
-
 
 int main()
 {
@@ -32,6 +32,8 @@ int main()
 		writeln(cast(char)code);
 	}
 	
+	RegexMatch!(string) match = matchAll("The Quick Brown Fox Jumps Over The Lazy Dog", regex(r"quick\s(brown).+?(jumps)","gmi"));
+	writeln(match);
 	
 	//string st = "Hello";
 	//writeln( cast(int)st[0] );
