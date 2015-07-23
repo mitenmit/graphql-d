@@ -19,16 +19,20 @@ struct SourceLocation{
  
 SourceLocation getLocation(Source source, int position){
 	int line = 1;
-	int column = position+1;
-	//string lineRegexp = /\r\n|[\n\r\u2028\u2029]/g;
-	RegexMatch!(string) match;
-
-	/*
-	while( (match=matchAll(source.srcBody, regex(r"\r\n|[\n\r\u2028\u2029]","gmi")) )<>[] && match.index < position ){		
-		line += 1;
-		column = position + 1 - (match.index + match[0].length);
-	}
-	*/
+	int column;
+	Captures!(string) match;
+	int acumulatedPos = 0;
+	
+	match=matchFirst(source.srcBody, regex(r"\r\n|[\n\r\u2028\u2029]","gmi"));
+	
+	while(match && acumulatedPos+match.pre.length+match[0].length < position){
+		line++;
+		acumulatedPos += (match.pre.length+match[0].length);
+		match=matchFirst(match.post, regex(r"\r\n|[\n\r\u2028\u2029]","gmi"));
+	};	
+	//writeln(source.srcBody[0..position]);
+	
+	column = position - acumulatedPos + (acumulatedPos ? 0 : 1);
 	
 	return SourceLocation(line, column);
 }

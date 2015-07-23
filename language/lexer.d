@@ -314,7 +314,7 @@ Token readNumber(Source source, int start, int firstCode)
 	
 	while(
 		position < sBody.length &&
-		(code = cast(int)sBody[position])<>0 &&
+		(code = cast(int)sBody[position])!=0 &&
 		code != 34 &&
 		code != 10 && code != 13 && code != 0x2028 && code != 0x2029
 	){
@@ -411,7 +411,7 @@ Token readName(Source source, int position)
 	
 	while(
 		end != bodyLength &&
-		(code = cast(int)sBody[end])<>0 &&
+		(code = cast(int)sBody[end])!=0 &&
 		(
 			code == 95 ||
 			code >= 48 && code <= 57 || // 0-9

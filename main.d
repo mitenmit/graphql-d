@@ -3,6 +3,7 @@ import std.regex;
 
 import source;
 import lexer;
+import location;
 
 int main()
 {
@@ -26,17 +27,28 @@ int main()
 	
 	while(
 		pos!=txtLen &&
-		(code = cast(int)txt[pos])<>0
+		(code = cast(int)txt[pos])!=0
 	){
 		++pos;
 		writeln(cast(char)code);
 	}
 	
-	RegexMatch!(string) match = matchAll("The Quick Brown Fox Jumps Over The Lazy Dog", regex(r"quick\s(brown).+?(jumps)","gmi"));
-	writeln(match);
+	string multiLines =
+"{
+	{
+	User(id=1):
+		name,
+		location
+	}
+}";
+		
+	Captures!(string) match = matchFirst(multiLines, regex(r"\r\n|[\n\r\u2028\u2029]","gmi") );
+	//writeln( match.pre.length );
+	Source source = new Source;
+	source.srcBody = multiLines;
 	
-	//string st = "Hello";
-	//writeln( cast(int)st[0] );
+	for(int i=0; i<40; i++)
+		writeln(i,": ", getLocation(source, i) );
 	
 	return 0;
 }
