@@ -8,15 +8,33 @@ int main()
 {
 	Source src = new Source;
 	
-	src.srcBody = "{hello}";
+	src.srcBody = "{hello: 753}";
 	
 	Lexer nextToken = lex(src);
 	
 	Token a = nextToken(0);
 	
-	string st = "Hello";
+	Token numToken = readNumber(src, 8, 55);
+	writeln(numToken);
 	
-	writeln( cast(int)st[0] );
+	writeln(cast(char)72);
+	
+	string txt = "This is some text";
+	int txtLen = txt.length;
+	int code;
+	int pos = 0;
+	
+	while(
+		pos!=txtLen &&
+		(code = cast(int)txt[pos])<>0
+	){
+		++pos;
+		writeln(cast(char)code);
+	}
+	
+	
+	//string st = "Hello";
+	//writeln( cast(int)st[0] );
 	
 	return 0;
 }
