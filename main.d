@@ -4,6 +4,7 @@ import std.regex;
 import source;
 import lexer;
 import location;
+import kinds;
 
 int main()
 {
@@ -47,8 +48,10 @@ int main()
 	Source source = new Source;
 	source.srcBody = multiLines;
 	
+	/*
 	for(int i=0; i<40; i++)
 		writeln(i,": ", getLocation(source, i) );
+	*/
 	
 	return 0;
 }
