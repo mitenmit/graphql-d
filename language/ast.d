@@ -11,7 +11,30 @@ struct Location{
 	Source source;
 }
 
-alias Node = TypeTuple!(Name);
+alias Node = TypeTuple!(
+	Name,
+	Document,
+	OperationDefinition,
+	VariableDefinition,
+	Variable,
+	SelectionSet,
+	Field,
+	Argument,
+	FragmentSpread,
+	InlineFragment,
+	FragmentDefinition,
+	IntValue,
+	FloatValue,
+	StringValue,
+	BooleanValue,
+	EnumValue,
+	ArrayValue,
+	ObjectValue,
+	ObjectField,
+	Directive,
+	ListType,
+	NonNullType
+);
 
 // Name
 
@@ -36,15 +59,17 @@ struct Document(T){
 
 alias Definition = TypeTuple!(OperationDefinition, FragmentDefinition);
 
-struct OperationDefinition{
+
+struct OperationDefinition(VDT, VDV, D, SS){
 	string kind = "OperationDefinition";
 	Location loc;
 	string operation;
 	Name name;
-	VariableDefinition[] variableDefinitions;
-	Direcive[] directives;
-	SelectionSet selectionSet;
+	VariableDefinition!(VDT, VDV)[] variableDefinitions;
+	Directive!(D)[] directives;
+	SelectionSet!(SS) selectionSet;
 }
+
 
 struct VariableDefinition(T, V){
 	static if ( staticIndexOf!(T,Type) != -1 && staticIndexOf!(V, Value) != -1)	
@@ -52,10 +77,10 @@ struct VariableDefinition(T, V){
 		string kind = "VariableDefinition";
 		Location loc;
 		Variable variable;
-		Type type;
-		Value defaultValue;
+		T type;
+		V defaultValue;
 	}else{
-		static assert(0, "Type not supported for Document.");
+		static assert(0, "Type not supported for VariableDefinition.");
 	}
 }
 
@@ -65,26 +90,33 @@ struct Variable{
 	Name name;
 }
 
-struct SelectionSet{
-	string kind = "SelectionSet";
-	Location loc;
-	S[]	selections;
+struct SelectionSet(T){
+	static if ( staticIndexOf!(T,Selection) != -1 )	
+	{
+		string kind = "SelectionSet";
+		Location loc;
+		T[]	selections;
+	}else{
+		static assert(0, "Type not supported for SelectionSet.");
+	}	
 }
 
 alias Selection = TypeTuple!(Field, FragmentSpread, InlineFragment);
 
-struct Field{
+
+struct Field(A, D, SS){
 	string kind = "Field";
 	Location loc;
 	Name fldAlias;
 	Name name;
-	Argument[] arguments;
-	Directive[] directives;
-	SelectionSet selectionSet;
+	Argument!(A)[] arguments;
+	Directive!(D)[] directives;
+	SelectionSet!(SS) selectionSet;
 }
 
+
 struct Argument(T){
-	static if ( staticIndexOf!(T,Dictionary) != -1 )	
+	static if ( staticIndexOf!(T,Value) != -1 )	
 	{	
 		string kind = "Argument";
 		Location loc;
@@ -97,33 +129,33 @@ struct Argument(T){
 
 // Fragments
 
-struct FragmentSpread{
+struct FragmentSpread(D){
 	string kind = "FragmentSpread";
 	Location loc;
 	Name name;
-	Directive[] directives;	
+	Directive!(D)[] directives;	
 }
 
-struct InlineFragment{
+struct InlineFragment(SS){
 	string kind = "InlineFragment";
 	Location loc;
 	NamedType typeCondition;
 	Directive[] directives;
-	SelectionSet selectionSet;
+	SelectionSet!(SS) selectionSet;
 }
 
-struct FragmentDefinition{
+struct FragmentDefinition(SS){
 	string kind = "FragmentDefinition";
 	Location loc;
 	Name name;
 	NamedType typeCondition;
 	Directive[] directives;
-	SelectionSet selectionSet;	
+	SelectionSet!(SS) selectionSet;	
 }
 
 // Values
 
-alias Selection = TypeTuple!(
+alias Value = TypeTuple!(
 	Variable,
 	IntValue,
 	FloatValue,
@@ -134,15 +166,102 @@ alias Selection = TypeTuple!(
 	ObjectValue
 );
 
-/*
-alias Dictionary = TypeTuple!(float, int, char);
-
-struct MyType(T){
-	static if ( staticIndexOf!(T,Dictionary) != -1 )	
-	{		
-		T number;
-	}else{
-		static assert(0, "Type not supported.");
-	}
+struct IntValue{
+	string kind = "IntValue";
+	Location loc;
+	string value;
 }
-*/
+
+struct FloatValue{
+	string kind = "FloatValue";
+	Location loc;
+	string value;
+}
+
+struct StringValue{
+	string kind = "StringValue";
+	Location loc;
+	string value;
+}
+
+struct BooleanValue{
+	string kind = "BooleanValue";
+	Location loc;
+	bool value;
+}
+
+struct EnumValue{
+	string kind = "EnumValue";
+	Location loc;
+	string value;
+}
+
+struct ArrayValue(T){
+	static if ( staticIndexOf!(T,Value) != -1 )	
+	{
+		string kind = "ArrayValue";
+		Location loc;
+		T[] values;
+	}else{
+		static assert(0, "Type not supported for Array.");
+	}	
+}
+
+struct ObjectValue(OF){
+	string kind = "ObjectValue";
+	Location loc;
+	ObjectField!(OF)[] fields;
+}
+
+struct ObjectField(T){
+	static if ( staticIndexOf!(T,Value) != -1 )	
+	{
+		string kind = "ObjectField";
+		Location loc;
+		Name name;
+		T value;
+	}else{
+		static assert(0, "Type not supported for Array.");
+	}	
+}
+
+// Directives
+
+struct Directive(A){
+	string kind = "Directive";
+	Location loc;
+	Name name;
+	Argument!(A)[] arguments;
+}
+
+// Types
+
+alias Type = TypeTuple!(NamedType, ListType, NonNullType);
+
+struct NamedType{
+	string kind = "NamedType";
+	Location loc;
+	Name name;
+}
+
+struct ListType(T){
+	static if ( staticIndexOf!(T,Type) != -1 )	
+	{
+		string kind = "ListType";
+		Location loc;
+		T type;
+	}else{
+		static assert(0, "Type not supported for Type.");
+	}	
+}
+
+struct NonNullType(T){
+	static if ( staticIndexOf!(T,TypeTuple!(NamedType, ListType)) != -1 )	
+	{
+		string kind = "NonNullType";
+		Location loc;
+		T type;
+	}else{
+		static assert(0, "Type not supported for NonNullType.");
+	}	
+}
