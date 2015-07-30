@@ -1,0 +1,10 @@
+{
+	"name": "graphql-d",
+	"description": "GraphQL implementation in D",
+	"copyright": "Copyright © 2015, mit",
+	"authors": ["mit"],
+	"dependencies": {
+	},
+	
+	"targetName": "main",
+}

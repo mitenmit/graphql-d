@@ -29,7 +29,7 @@ SourceLocation getLocation(Source source, int position){
 		line++;
 		acumulatedPos += (match.pre.length+match[0].length);
 		match=matchFirst(match.post, regex(r"\r\n|[\n\r\u2028\u2029]","gmi"));
-	};
+	}
 	//writeln(source.srcBody[0..position]);
 
 	column = position - acumulatedPos + (acumulatedPos ? 0 : 1);

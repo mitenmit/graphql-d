@@ -8,6 +8,7 @@ import location;
 import kinds;
 import ast;
 import parsercore;
+import parser;
 
 //import jsvar;
 
@@ -19,37 +20,51 @@ class Changer{
 }
 
 void chParam(Changer c){
-	c.param = "Changed parameter of the struct";
+	c.param = "Changed parameter of the class";
 }
 
 void chParam1(Changer c){
 	chParam(c);
 }
 
+class TestArrRef{
+	string[] arr;
+	
+	this(){}
+	
+	this(string[] arr){
+		this.arr = arr.dup;
+		arr=["changed"];
+	}
+	
+	override string toString(){
+		string result="[";
+		
+		foreach(a; arr){
+			result~=a~",";
+		}
+		result ~= "]";
+		
+		return result;
+	}
+}
+
 int main()
 {
-	alias Atom = Algebraic!(string, int);
-	Atom[] atom;
+	string[] stringsArr = ["1", "2", "3"];
+	auto stringsCls = new TestArrRef(stringsArr);
+	stringsArr[1] = "Changed";
+	writeln(stringsArr);
+	writeln(stringsCls.arr);
 	
-	writeln(atom.capacity);
-	
-	atom ~= Atom(5);
-	writeln("Atom: ", atom);
-	//atom ~= Atom("Test");
-	//atom[1] = "Test";
-	//writeln("Atom: ", atom[1]);
-	writeln(atom.length);
-	
-	Changer cp = new Changer("tt");
-	//cp.param = "Initially set parameter of the struct";
-
+	Changer cp = new Changer("Initially set parameter of the class");
 	writeln(cp.param);
 	chParam1(cp);
 	writeln(cp.param);
 	
 	Changer[] nodes;
 	nodes ~= new Changer("New element");
-	//writeln(nodes[0].param);
+	//writeln(nodes[0]);
 	
 	Source src = new Source;
 	
@@ -57,15 +72,14 @@ int main()
 	
 	parsercore.Parser p = makeParser(src, ParseOptions(false, false) );
 	
-	Lexer nextToken = lex(src);
 	
+	Lexer nextToken = lex(src);
 	Token a = nextToken(0);
 	
 	Token numToken = readNumber(src, 8, 55);
 	writeln(numToken);
 	
-	writeln(cast(char)72);
-	
+	/*
 	string txt = "This is some text";
 	int txtLen = txt.length;
 	int code;
@@ -78,6 +92,7 @@ int main()
 		++pos;
 		writeln(cast(char)code);
 	}
+	*/
 	
 	string multiLines =
 "{

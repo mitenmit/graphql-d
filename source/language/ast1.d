@@ -1,5 +1,6 @@
 import std.typetuple;
 import std.typecons;
+import std.variant;
 import std.string;
 import std.traits;
 
@@ -11,7 +12,7 @@ struct Location{
 	Source source;
 }
 
-alias Node = TypeTuple!(
+alias Node = Algebraic!(
 	Name,
 	Document,
 	OperationDefinition,
@@ -46,6 +47,7 @@ struct Name{
 
 // Document
 
+/*
 struct Document(T){
 	static if ( staticIndexOf!(T,Definition) != -1 )	
 	{		
@@ -58,30 +60,33 @@ struct Document(T){
 }
 
 alias Definition = TypeTuple!(OperationDefinition, FragmentDefinition);
+*/
 
+struct Document{
+	string kind = "Document";
+	Location loc;
+	Definition[] definitions;
+}
 
-struct OperationDefinition(VDT, VDV, D, SS){
+alias Definition = Algebraic!(OperationDefinition, FragmentDefinition);
+
+struct OperationDefinition(SS){
 	string kind = "OperationDefinition";
 	Location loc;
 	string operation;
 	Name name;
-	VariableDefinition!(VDT, VDV)[] variableDefinitions;
-	Directive!(D)[] directives;
+	VariableDefinition[] variableDefinitions;
+	Directive[] directives;
 	SelectionSet!(SS) selectionSet;
 }
 
 
-struct VariableDefinition(T, V){
-	static if ( staticIndexOf!(T,Type) != -1 && staticIndexOf!(V, Value) != -1)	
-	{
-		string kind = "VariableDefinition";
-		Location loc;
-		Variable variable;
-		T type;
-		V defaultValue;
-	}else{
-		static assert(0, "Type not supported for VariableDefinition.");
-	}
+struct VariableDefinition{
+	string kind = "VariableDefinition";
+	Location loc;
+	Variable variable;
+	Type type;
+	Value defaultValue;
 }
 
 struct Variable{
@@ -101,39 +106,33 @@ struct SelectionSet(T){
 	}	
 }
 
-alias Selection = TypeTuple!(Field, FragmentSpread, InlineFragment);
+alias Selection = Algebraic!(Field, FragmentSpread, InlineFragment);
 
-
-struct Field(A, D, SS){
+struct Field(SS){
 	string kind = "Field";
 	Location loc;
 	Name fldAlias;
 	Name name;
-	Argument!(A)[] arguments;
-	Directive!(D)[] directives;
+	Argument[] arguments;
+	Directive[] directives;
 	SelectionSet!(SS) selectionSet;
 }
 
 
-struct Argument(T){
-	static if ( staticIndexOf!(T,Value) != -1 )	
-	{	
-		string kind = "Argument";
-		Location loc;
-		Name name;
-		T value;
-	}else{
-		static assert(0, "Type not supported for Argument.");
-	}	
+struct Argument{	
+	string kind = "Argument";
+	Location loc;
+	Name name;
+	Value value;	
 }
 
 // Fragments
 
-struct FragmentSpread(D){
+struct FragmentSpread{
 	string kind = "FragmentSpread";
 	Location loc;
 	Name name;
-	Directive!(D)[] directives;	
+	Directive[] directives;	
 }
 
 struct InlineFragment(SS){
@@ -155,7 +154,7 @@ struct FragmentDefinition(SS){
 
 // Values
 
-alias Value = TypeTuple!(
+alias Value = Algebraic!(
 	Variable,
 	IntValue,
 	FloatValue,
@@ -201,7 +200,7 @@ struct ArrayValue(T){
 	{
 		string kind = "ArrayValue";
 		Location loc;
-		T[] values;
+		Value[] values;
 	}else{
 		static assert(0, "Type not supported for Array.");
 	}	
@@ -227,16 +226,16 @@ struct ObjectField(T){
 
 // Directives
 
-struct Directive(A){
+struct Directive{
 	string kind = "Directive";
 	Location loc;
 	Name name;
-	Argument!(A)[] arguments;
+	Argument[] arguments;
 }
 
 // Types
 
-alias Type = TypeTuple!(NamedType, ListType, NonNullType);
+alias Type = Algebraic!(NamedType, ListType, NonNullType);
 
 struct NamedType{
 	string kind = "NamedType";
@@ -244,15 +243,15 @@ struct NamedType{
 	Name name;
 }
 
-struct ListType(T){
-	static if ( staticIndexOf!(T,Type) != -1 )	
-	{
+class ListType(T){
+	//static if ( staticIndexOf!(T,Type) != -1 )	
+	//{
 		string kind = "ListType";
 		Location loc;
 		T type;
-	}else{
-		static assert(0, "Type not supported for Type.");
-	}	
+	//}else{
+		//static assert(0, "Type not supported for Type.");
+	//}	
 }
 
 struct NonNullType(T){
