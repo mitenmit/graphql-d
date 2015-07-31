@@ -49,8 +49,51 @@ class TestArrRef{
 	}
 }
 
+class RecClass{
+	string name;
+	
+	RecClass node;
+	
+	this(){}
+	
+	this(string name){
+		this.name = name;
+	}
+	
+	this(RecClass node){
+		this.node = node;
+	}
+	
+	this(string name, RecClass node){
+		this.name = name;
+		this.node = node;
+	}
+	
+	override string toString(){
+		return name;
+	}
+	
+	void showTree()
+	{
+		RecClass res = this;
+		int tab = 0;
+		
+		while(res !is null){
+			for(int t=0;t<tab; t++)
+				write("\t");
+			writeln(res.name);
+			tab++;
+			res = res.node;
+		}
+	}
+}
+
 int main()
 {
+	RecClass rec = new RecClass("Level 1", new RecClass("Level 2", new RecClass("Level 3")));
+	//writeln(rec);
+	rec.showTree();
+
 	string[] stringsArr = ["1", "2", "3"];
 	auto stringsCls = new TestArrRef(stringsArr);
 	stringsArr[1] = "Changed";

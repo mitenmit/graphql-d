@@ -31,7 +31,28 @@ Document parseDocument(Parser parser){
 	int start = parser.token.start;
 	Definition[] definitions;
 	
-	
+	do{
+		if( peek(parser, TokenKind.BRACE_L) ){
+			definitions ~= parseOperationDefinition(parser);
+		}else if( peek(parser, TokenKind.NAME) ){
+			if(parser.token.value == "query" || parser.token.value == "mutation"){
+				//definitions ~= parseOperationDefinition(parser);
+			}else if( parser.token.value == "fragment" ){
+				//definitions ~= parseFragmentDefinition(parser);
+			} else {
+				//throw unexpected(parser);
+			}
+		} else {
+			//throw unexpected(parser);
+		}
+		
+	} while( !skip(parser, TokenKind.EOF) );
 	
 	return new Document(DOCUMENT, loc(parser, start), definitions);
+}
+
+OperationDefinition parseOperationDefinition(Parser parser){
+	int start = parser.token.start;
+	
+	return new OperationDefinition();
 }
