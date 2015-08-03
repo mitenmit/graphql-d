@@ -27,7 +27,7 @@ enum FLOAT = "FloatValue";
 enum STRING = "StringValue";
 enum BOOLEAN = "BooleanValue";
 enum ENUM = "EnumValue";
-enum ARRAY = "ArrayValue";
+enum LIST = "ListValue";
 enum OBJECT = "ObjectValue";
 enum OBJECT_FIELD = "ObjectField";
 

@@ -110,14 +110,15 @@ bool skip(Parser parser, int kind){
  */
 Token expect(Parser parser, int kind){
 	Token token = parser.token;
+	
 	if(token.kind == kind){
 		advance(parser);
 		return token;
 	}
 	
 	//throw syntaxError(parser.source, token.start, "Expected "~getTokenKindDesc(kind)~", found "~getTokenDesc(token));
-	//assert(0);
-	return Token();
+	assert(0, "Expected "~getTokenKindDesc(kind)~", found "~getTokenDesc(token));
+	//return Token();
 }
 
 /**
@@ -157,7 +158,7 @@ Error unexpected(Parser parser, Token atToken){
  * and ends with a lex token of closeKind. Advances the parser
  * to the next lex token after the closing token.
  */
-T[] any(T)(Parser parser, int openKind, T delegate(Parser) parseFn,int closeKind){
+T[] any(T)(Parser parser, int openKind, T function(Parser) parseFn,int closeKind){
 	expect(parser, openKind);
 	T[] nodes;
 	
@@ -174,7 +175,7 @@ T[] any(T)(Parser parser, int openKind, T delegate(Parser) parseFn,int closeKind
  * and ends with a lex token of closeKind. Advances the parser
  * to the next lex token after the closing token.
  */
-T[] many(T)(Parser parser, int openKind, T delegate(Parser) parseFn,int closeKind){
+T[] many(T)(Parser parser, int openKind, T function(Parser) parseFn,int closeKind){
 	expect(parser, openKind);
 	T[] nodes;
 	nodes ~= parseFn(parser);

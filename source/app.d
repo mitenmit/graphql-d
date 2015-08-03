@@ -1,6 +1,7 @@
 import std.stdio;
 import std.regex;
 import std.variant;
+import std.conv;
 
 import source;
 import lexer;
@@ -90,20 +91,22 @@ class RecClass{
 
 int main()
 {
+	//Test recursive class
 	RecClass rec = new RecClass("Level 1", new RecClass("Level 2", new RecClass("Level 3")));
 	//writeln(rec);
-	rec.showTree();
+	//rec.showTree();
 
+	//Test how arrays are passed by refference and copied
 	string[] stringsArr = ["1", "2", "3"];
 	auto stringsCls = new TestArrRef(stringsArr);
 	stringsArr[1] = "Changed";
-	writeln(stringsArr);
-	writeln(stringsCls.arr);
+	//writeln(stringsArr);
+	//writeln(stringsCls.arr);
 	
 	Changer cp = new Changer("Initially set parameter of the class");
-	writeln(cp.param);
+	//writeln(cp.param);
 	chParam1(cp);
-	writeln(cp.param);
+	//writeln(cp.param);
 	
 	Changer[] nodes;
 	nodes ~= new Changer("New element");
@@ -111,30 +114,29 @@ int main()
 	
 	Source src = new Source;
 	
-	src.srcBody = "{hello: 753}";
+	src.srcBody = "{ hello }";
 	
-	parsercore.Parser p = makeParser(src, ParseOptions(false, false) );
+	src.srcBody = "query FetchLukeQuery{human(id: \"1000\"){name}}";
 	
+	//parsercore.Parser p = makeParser(src, ParseOptions(false, false) );
 	
-	Lexer nextToken = lex(src);
-	Token a = nextToken(0);
+	Document d = parse(src, ParseOptions(false, false));
 	
-	Token numToken = readNumber(src, 8, 55);
-	writeln(numToken);
+	writeln( d.definitions[0].get!(OperationDefinition)().operation );
+	writeln( d.definitions[0].get!(OperationDefinition)().name.value );
+	
+	Field f = d.definitions[0].get!(OperationDefinition)().selectionSet.selections[0].get!(Field)();
+	writeln( f.name.value );
+	writeln( f.arguments[0].value.kind );
+	writeln( f.arguments[0].name.value ~":"~to!string(f.arguments[0].value.get!(StringValue)().value ) );
+	writeln( f.selectionSet.selections[0].get!(Field)().name.value );
+	
+	//Lexer nextToken = lex(src);
+	//Token a = nextToken(0);
 	
 	/*
-	string txt = "This is some text";
-	int txtLen = txt.length;
-	int code;
-	int pos = 0;
-	
-	while(
-		pos!=txtLen &&
-		(code = cast(int)txt[pos])!=0
-	){
-		++pos;
-		writeln(cast(char)code);
-	}
+	Token numToken = readNumber(src, 8, 55);
+	writeln(numToken);
 	*/
 	
 	string multiLines =
@@ -145,16 +147,13 @@ int main()
 		location
 	}
 }";
-		
+
+	/*	
 	Captures!(string) match = matchFirst(multiLines, regex(r"\r\n|[\n\r\u2028\u2029]","gmi") );
 	//writeln( match.pre.length );
 	Source source = new Source;
 	source.srcBody = multiLines;
-	
-	/*
-	for(int i=0; i<40; i++)
-		writeln(i,": ", getLocation(source, i) );
 	*/
-	
+		
 	return 0;
 }

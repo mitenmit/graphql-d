@@ -33,7 +33,6 @@ class Document{
 	Location loc;
 	Definition[] definitions;
 	
-	
 	this(){}
 	
 	this(string kind, Location loc, Definition[] definitions){
@@ -72,16 +71,42 @@ class Definition{
 		kind = 2;
 	}
 	
+	/*
+	void opCatAssign(OperationDefinition opDef){
+		//this.m_opDef = opDef;
+		//kind = 1;
+		//return this.m_opDef;
+	}
+	
+	void opAssign(FragmentDefinition fragDef){
+		//this.m_fragDef = fragDef;
+		//kind = 2;
+		//return this.m_fragDef;
+	}
+	*/
+	
 	alias get this;
 	
 	@property inout(T) get(T)() inout
     {
+		static if (is(T == OperationDefinition))
+        {
+            return this.m_opDef;
+        }
+		
+		static if (is(T == FragmentDefinition)){
+			return this.m_fragDef;
+		}
+		
+		
+		/*
 		switch(kind){
-			case 1: return this.m_opDef; break;
-			case 2: return this.m_fragDef; break;
+			case 1: return this.m_opDef;
+			case 2: return this.m_fragDef;
 			default: break;
 		}
 		return m_opDef;
+		*/
 	}
 }
 
@@ -125,6 +150,17 @@ class VariableDefinition{
 	Variable variable;
 	Type type;
 	Value defaultValue;
+	
+	this(){}
+	
+	this(string kind, Location loc, Variable variable, Type type, Value defaultValue){
+		this.kind = kind;
+		this.loc = loc;
+		
+		this.variable = variable;
+		this.type = type;
+		this.defaultValue = defaultValue;
+	}
 }
 
 class Variable{
@@ -145,6 +181,8 @@ class SelectionSet{
 	string kind = "SelectionSet";
 	Location loc;
 	Selection[]	selections;
+	
+	this(){}
 	
 	this(string kind, Location loc, Selection[]	selections){
 		this.kind = kind;
@@ -197,13 +235,28 @@ class Selection{
 	
 	@property inout(T) get(T)() inout
     {
+		static if (is(T == Field))
+        {
+            return this.m_field;
+        }
+		
+		static if (is(T == FragmentSpread)){
+			return this.m_fragSpread;
+		}
+		
+		static if (is(T == InlineFragment)){
+			return this.m_inlineFrag;
+		}
+		
+		/*
 		switch(kind){
-			case 1: return this.m_field; break;
-			case 2: return this.m_fragSpread; break;
-			case 3: return this.m_inlineFrag; break;
+			case 1: return this.m_field;
+			case 2: return this.m_fragSpread;
+			case 3: return this.m_inlineFrag;
 			default: break;
 		}
 		return this.field;
+		*/
 	}
 }
 
@@ -215,6 +268,19 @@ class Field{
 	Argument[] arguments;
 	Directive[] directives;
 	SelectionSet selectionSet;
+	
+	this(){}
+	
+	this(string kind, Location loc, Name fldAlias, Name name, Argument[] arguments, Directive[] directives, SelectionSet selectionSet){
+		this.kind = kind;
+		this.loc = loc;
+		this.fldAlias = fldAlias;
+		this.name = name;
+		
+		this.arguments = arguments.dup;
+		this.directives = directives.dup;
+		this.selectionSet = selectionSet;
+	}
 }
 
 class Argument{	
@@ -303,7 +369,7 @@ class Value{
 		StringValue 	m_strVal;	//4
 		BooleanValue	m_boolVal;	//5
 		EnumValue		m_enumVal;	//6
-		ArrayValue		m_arrVal;	//7
+		ListValue		m_listVal;	//7
 		ObjectValue		m_objVal;	//8
 	}
 	
@@ -341,8 +407,8 @@ class Value{
 		this.kind = 6;
 	}
 	
-	this(ArrayValue arrVal){
-		this.m_arrVal = arrVal;
+	this(ListValue listVal){
+		this.m_listVal = listVal;
 		this.kind = 7;
 	}
 	
@@ -381,8 +447,8 @@ class Value{
 		this.kind = 6;
 	}
 	
-	void opAssign(ArrayValue arrVal){
-		this.m_arrVal = arrVal;
+	void opAssign(ListValue listVal){
+		this.m_listVal = listVal;
 		this.kind = 7;
 	}
 	
@@ -395,19 +461,59 @@ class Value{
 	
 	@property inout(T) get(T)() inout
     {
+		static if( is(T == Variable) ){
+			return this.m_var;
+		}
+		static if (is(T == IntValue))
+        {
+            return this.m_intVal;
+        }
+		
+		static if (is(T == FloatValue))
+        {
+            return this.m_floatVal;
+        }
+		
+		static if (is(T == StringValue))
+        {
+            return this.m_strVal;
+        }
+		
+		static if (is(T == BooleanValue))
+        {
+            return this.m_boolVal;
+        }
+		
+		static if (is(T == EnumValue))
+        {
+            return this.m_enumVal;
+        }
+		
+		static if (is(T == ListValue))
+        {
+            return this.m_listVal;
+        }
+		
+		static if (is(T == ObjectValue))
+        {
+            return this.m_objVal;
+        }
+		
+		/*
 		switch(kind){
-			case 1: return this.m_var; break;
-			case 2: return this.m_intVal; break;
-			case 3: return this.m_floatVal; break;
-			case 4: return this.m_strVal; break;
-			case 5: return this.m_boolVal; break;
-			case 6: return this.m_enumVal; break;
-			case 7: return this.m_arrVal; break;
-			case 8: return this.m_objVal; break;
+			case 1: return this.m_var;
+			case 2: return this.m_intVal;
+			case 3: return this.m_floatVal;
+			case 4: return this.m_strVal;
+			case 5: return this.m_boolVal;
+			case 6: return this.m_enumVal;
+			case 7: return this.m_listVal;
+			case 8: return this.m_objVal;
 			default: break;
 		}
 		
 		return this.m_var;
+		*/
 	}
 }
 
@@ -481,8 +587,8 @@ class EnumValue{
 	}
 }
 
-class ArrayValue{
-	string kind = "ArrayValue";
+class ListValue{
+	string kind = "ListValue";
 	Location loc;
 	Value[] values;
 	

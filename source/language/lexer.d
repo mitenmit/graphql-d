@@ -1,6 +1,7 @@
 module lexer;
 
 import std.stdio;
+import std.conv;
 
 import source;
 
@@ -10,6 +11,10 @@ struct Token{
 	int end;
 	
 	string value;
+	
+	string toString(){
+		return "Token kind: "~to!string(this.kind)~"\nToken value: "~this.value;
+	}
 }
 
 
@@ -21,7 +26,13 @@ Lexer lex(Source source){
 	Token nextToken(int resetPosition){
 		Token token;
 		
-		token = readToken(source, resetPosition ? resetPosition : prevPosition);
+		token = readToken(source, resetPosition>0 ? resetPosition : prevPosition);
+		/*
+		writeln("After advance:");
+		writeln(token);
+		writeln("---------------");
+		writeln("-");
+		*/
 		prevPosition = token.end;
 		return token;
 	}
@@ -113,11 +124,14 @@ Token readToken(Source source, int fromPosition)
 	int bodyLength = sBody.length;
 	
 	int position = positionAfterWhitespace(sBody, fromPosition);
-	int code = cast(int)sBody[position];
+	
+	int code = position < bodyLength ? cast(int)sBody[position] : 0;
 	
 	if (position >= bodyLength) {
 		return makeToken(TokenKind.EOF, position, position, null);
 	}
+	
+	//writeln("position [in lexer->readToken]:",position);
 	
 	switch(code){
 		 // !
@@ -175,10 +189,8 @@ Token readToken(Source source, int fromPosition)
 		default:
 			break;
 	}
-	
 	//trhow syntaxError(source, position, "Unexpected character '"~cast(char)code~"'");
 	
-	//Token t = {1,1,1, "{"}; //Temporary initiaisation
 	return Token();
 }
 
@@ -225,7 +237,7 @@ Token readToken(Source source, int fromPosition)
 		}
 	}
 	
-	return 0;
+	return position;
  }
  
 /**
