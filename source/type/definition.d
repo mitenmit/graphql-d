@@ -172,5 +172,201 @@ class GraphQLObjectType{
 }
 
 T resolveMaybeThunk(T)(T thingOrThung){
+	return thingOrThung;
+}
+
+T resolveMaybeThunk(T)(T function() thingOrThung){
+	return thingOrThung();
+}
+
+GraphQLInterfaceType[] defineInterface(T)(T interfacesOrThunk){
+	return resolveMaybeThunk(interfacesOrThunk);
+}
+
+GraphQLFieldDefinitionMap defineFieldMap(GraphQLFieldConfigMap fields){
 	return null;
 }
+
+/**
+ * Update the interfaces to know about this implementation.
+ * This is an rare and unfortunate use of mutation in the type definition
+ * implementations, but avoids an expensive "getPossibleTypes"
+ * implementation for Interface types.
+ */
+ 
+void addImplementationToInterface(T)(T impl){
+}
+
+class GraphQLObjectTypeConfig{
+	string name;
+	string description;
+}
+
+alias GraphQLInterfaceType[] function() GraphQLInterfacesThunk;
+alias GraphQLFieldConfigMap function() GraphQLFieldConfigMapThunk;
+
+class GraphQLFieldConfig{
+	
+}
+
+alias GraphQLArgumentConfig[string] GraphQLFieldConfigArgumentMap;
+
+class GraphQLArgumentConfig{
+}
+
+alias GraphQLFieldConfig[string] GraphQLFieldConfigMap;
+
+class GraphQLFieldDefinition{
+}
+
+class GraphQLArgument{
+	string name;
+	GraphQLInputType type;
+	//defaultValue
+	string description;
+}
+
+alias GraphQLFieldDefinition[string] GraphQLFieldDefinitionMap;
+
+/**
+ * Interface Type Definition
+ *
+ * When a field can return one of a heterogeneous set of types, a Interface type
+ * is used to describe what types are possible, what fields are in common across
+ * all types, as well as a function to determine which type is actually used
+ * when the field is resolved.
+ *
+ * Example:
+ *
+ *     var EntityType = new GraphQLInterfaceType({
+ *       name: 'Entity',
+ *       fields: {
+ *         name: { type: GraphQLString }
+ *       }
+ *     });
+ *
+ */
+ 
+ class GraphQLInterfaceType{
+	string name;
+	string secription;
+	
+	GraphQLInterfaceTypeConfig _typeConfig;
+	GraphQLFieldDefinitionMap _fields;
+	GraphQLObjectType[] _implementations;
+	bool[string] _possibleTypeNames;
+	
+	this(){}
+	
+	this(GraphQLInterfaceTypeConfig config){
+	}
+	
+	GraphQLFieldDefinitionMap getFields(){
+		return null;
+	}
+	
+	GraphQLObjectType[] getPossibleTypes(){
+		return this._implementations;
+	}
+	
+	bool isPosibleType(GraphQLObjectType type){
+		return true;
+	}
+	
+	GraphQLObjectType resolveType(T)(T value){
+		return null;
+	}
+	
+	string toString(){
+		return this.name;
+	}
+	
+ }
+ 
+GraphQLObjectType getTypeOf(T)(T value, GraphQLAbstractType abstractType){
+	return null;
+}
+
+class GraphQLInterfaceTypeConfig{
+	string name;
+}
+
+/**
+ * Union Type Definition
+ *
+ * When a field can return one of a heterogeneous set of types, a Union type
+ * is used to describe what types are possible as well as providing a function
+ * to determine which type is actually used when the field is resolved.
+ *
+ * Example:
+ *
+ *     var PetType = new GraphQLUnionType({
+ *       name: 'Pet',
+ *       types: [ DogType, CatType ],
+ *       resolveType(value) {
+ *         if (value instanceof Dog) {
+ *           return DogType;
+ *         }
+ *         if (value instanceof Cat) {
+ *           return CatType;
+ *         }
+ *       }
+ *     });
+ *
+ */
+ 
+class GraphQLUnionType {
+	string name;
+	string description;
+	
+	GraphQLUnionTypeConfig _typeConfig;
+	GraphQLObjectType[] _types;
+	bool[string] _possibleTypeNames;
+	
+	this(){}
+	
+	this(GraphQLUnionTypeConfig config){
+	}
+	
+	GraphQLObjectType[] getPossibleTypes(){
+		return this._types;
+	}
+	
+	bool isPossibleType(GraphQLObjectType type){
+		return this._types;
+	}
+	
+	GraphQLObjectType resolveType(T)(T value){
+		return null;
+	}
+	
+	string toString(){
+		return this.name;
+	}
+}
+
+class GraphQLUnionTypeConfig{
+	string name;
+}
+
+/**
+ * Enum Type Definition
+ *
+ * Some leaf values of requests and input values are Enums. GraphQL serializes
+ * Enum values as strings, however internally Enums can be represented by any
+ * kind of type, often integers.
+ *
+ * Example:
+ *
+ *     var RGBType = new GraphQLEnumType({
+ *       name: 'RGB',
+ *       values: {
+ *         RED: { value: 0 },
+ *         GREEN: { value: 1 },
+ *         BLUE: { value: 2 }
+ *       }
+ *     });
+ *
+ * Note: If a value is not provided in a definition, the name of the enum value
+ * will be used as it's internal value.
+ */
