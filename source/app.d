@@ -108,6 +108,8 @@ int main()
 	chParam1(cp);
 	//writeln(cp.param);
 	
+	writeln("Typeid: ", is(typeof(cp) == Changer) );
+	
 	Changer[] nodes;
 	nodes ~= new Changer("New element");
 	//writeln(nodes[0]);
