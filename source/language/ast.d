@@ -5,6 +5,7 @@ import std.string;
 import std.traits;
 
 import source;
+import uniontype;
 
 struct Location{
 	int start;
@@ -42,6 +43,7 @@ class Document{
 	}
 }
 
+
 class Definition{
 	union{
 		OperationDefinition m_opDef;	//1
@@ -71,19 +73,19 @@ class Definition{
 		kind = 2;
 	}
 	
-	/*
-	void opCatAssign(OperationDefinition opDef){
+	
+	//void opCatAssign(OperationDefinition opDef){
 		//this.m_opDef = opDef;
 		//kind = 1;
 		//return this.m_opDef;
-	}
+	//}
 	
-	void opAssign(FragmentDefinition fragDef){
+	//void opAssign(FragmentDefinition fragDef){
 		//this.m_fragDef = fragDef;
 		//kind = 2;
 		//return this.m_fragDef;
-	}
-	*/
+	//}
+	
 	
 	alias get this;
 	
@@ -97,18 +99,12 @@ class Definition{
 		static if (is(T == FragmentDefinition)){
 			return this.m_fragDef;
 		}
-		
-		
-		/*
-		switch(kind){
-			case 1: return this.m_opDef;
-			case 2: return this.m_fragDef;
-			default: break;
-		}
-		return m_opDef;
-		*/
 	}
 }
+
+
+//alias Definition = UnionType!(OperationDefinition, FragmentDefinition);
+//alias Definition = Algebraic!(OperationDefinition, FragmentDefinition);
 
 class OperationDefinition{
 	string kind = "OperationDefinition";
@@ -191,6 +187,7 @@ class SelectionSet{
 	}
 }
 
+/*
 class Selection{
 	union{
 		Field			m_field;		//1
@@ -247,18 +244,10 @@ class Selection{
 		static if (is(T == InlineFragment)){
 			return this.m_inlineFrag;
 		}
-		
-		/*
-		switch(kind){
-			case 1: return this.m_field;
-			case 2: return this.m_fragSpread;
-			case 3: return this.m_inlineFrag;
-			default: break;
-		}
-		return this.field;
-		*/
 	}
 }
+*/
+alias Selection = UnionType!(Field, FragmentSpread, InlineFragment);
 
 class Field{
 	string kind = "Field";
@@ -517,6 +506,19 @@ class Value{
 	}
 }
 
+/*
+alias Value = UnionType!(
+	Variable,
+	IntValue,
+	FloatValue,
+	StringValue,
+	BooleanValue,
+	EnumValue,
+	ListValue,
+	ObjectValue
+);
+*/
+
 class IntValue{
 	string kind = "IntValue";
 	Location loc;
@@ -706,6 +708,8 @@ class Type{
 		return this.m_namedType;
 	}
 }
+
+//alias Type = UnionType!(NamedType, ListType, NonNullType);
 
 class NamedType{
 	string kind = "NamedType";

@@ -92,14 +92,18 @@ class GraphQLNamedType{
 GraphQLNamedType getNamedType(GraphQLType type){
 	GraphQLType unmodifiedType = type;
 	
+	/*
 	while(
 		is(typeof(unmodifiedType) == GraphQLList) || 
 		is(typeof(unmodifiedType) == GraphQLNonNull)
 	){
-		unmodifiedType = unmodifiedType.ofType;
+		//unmodifiedType = unmodifiedType.ofType;
 	}
+	*/
 	
-	return unmodifiedType;
+	//return unmodifiedType;
+	
+	return null;
 }
 
 /**

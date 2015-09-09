@@ -2,6 +2,7 @@ import std.stdio;
 import std.regex;
 import std.variant;
 import std.conv;
+import std.traits;
 
 import source;
 import lexer;
@@ -10,6 +11,7 @@ import kinds;
 import ast;
 import parsercore;
 import parser;
+import uniontype;
 
 //import jsvar;
 
@@ -89,8 +91,36 @@ class RecClass{
 	}
 }
 
+class A{
+	A test;
+	string show(){
+		return "Class A";
+	}
+}
+
+class B{
+	string show(){
+		return "Class B";
+	}
+}
+
+class C{
+	string show(){
+		return "Class C";
+	}
+}
+
+//alias AB = UnionType!(A, B);
+alias AB = Algebraic!(A, B);
+
 int main()
 {
+	AB ut = new A();
+	ut = new B();
+	
+	writeln( ut );
+	writeln(typeid(IntValue).name);
+
 	//Test recursive class
 	RecClass rec = new RecClass("Level 1", new RecClass("Level 2", new RecClass("Level 3")));
 	//writeln(rec);
